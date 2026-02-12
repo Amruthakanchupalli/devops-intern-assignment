@@ -1,45 +1,20 @@
-name: Node.js Docker CI
+# Use official Node.js LTS image
+FROM node:18-alpine
 
-# Trigger on push to main branch
-on:
-  push:
-    branches:
-      - main
+# Set working directory inside container
+WORKDIR /usr/src/app
 
-jobs:
-  build-docker:
-    runs-on: ubuntu-latest
+# Copy package.json and package-lock.json
+COPY package*.json ./
 
-    steps:
-      # Step 1: Checkout the repo
-      - name: Checkout repository
-        uses: actions/checkout@v3
+# Install only production dependencies
+RUN npm install --omit=dev
 
-      # Step 2: Set up Node.js (for npm install)
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
+# Copy all app files
+COPY . .
 
-      # Step 3: Build Docker image
-      - name: Build Docker image
-        run: |
-          docker build -t 8byte-app .
+# Expose the port your app runs on
+EXPOSE 3000
 
-      # Step 4: Test Docker image (optional)
-      - name: Run Docker container for testing
-        run: |
-          docker run --rm 8byte-app node -v  # just checks node runs inside container
-
-      # Optional: Push to Docker Hub
-      # Uncomment and configure if you want to push
-      # - name: Log in to Docker Hub
-      #   uses: docker/login-action@v2
-      #   with:
-      #     username: ${{ secrets.DOCKER_USERNAME }}
-      #     password: ${{ secrets.DOCKER_PASSWORD }}
-      #
-      # - name: Push Docker image
-      #   run: |
-      #     docker tag 8byte-app yourdockerhubusername/8byte-app:latest
-      #     docker push yourdockerhubusername/8byte-app:latest
+# Command to run the app
+CMD ["node", "app.js"]
