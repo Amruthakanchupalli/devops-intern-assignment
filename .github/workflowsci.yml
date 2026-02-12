@@ -1,19 +1,19 @@
-# Use official Node.js LTS image
+# Use Node 18 alpine image
 FROM node:18-alpine
 
-# Set working directory inside container
-WORKDIR /usr/src/app
+# Set working directory inside the container
+WORKDIR /app
 
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
 # Install only production dependencies
-RUN npm install --omit=dev
+RUN npm install --only=production
 
-# Copy all app files
+# Copy the rest of the application
 COPY . .
 
-# Expose the port your app runs on
+# Expose the port your app uses
 EXPOSE 3000
 
 # Command to run the app
